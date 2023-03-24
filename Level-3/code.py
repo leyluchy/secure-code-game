@@ -1,6 +1,5 @@
 import os
-from flask import Flask, request  
-from werkzeug.utils import secure_filename
+from flask import Flask, request
 
 ### Unrelated to the exercise -- Starts here -- Please ignore
 app = Flask(__name__)
@@ -24,16 +23,12 @@ class TaxPayer:
         if not path:
             pass
         
-        # defends against path traversal attacks
-        if path.startswith('/') or path.startswith('..'):
-            return None
-        
         # builds path
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        prof_picture_path = os.path.normpath(os.path.join(base_dir, secure_filename(path)))
+        prof_picture_path = os.path.normpath(os.path.join(base_dir, path))
 
-        #if not prof_picture_path.startswith(base_dir):
-        #    raise Exception("not allowed")
+        if not prof_picture_path.startswith(base_dir):
+            return None
     
         with open(prof_picture_path, 'rb') as pic:
             picture = bytearray(pic.read())
@@ -47,9 +42,16 @@ class TaxPayer:
         
         if not path:
             raise Exception("Error: Tax form is required for all users")
+
+        # builds path
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        tax_path = os.path.normpath(os.path.join(base_dir, path))
+
+        if not tax_path.startswith(base_dir):
+            return None
        
-        with open(secure_filename(path), 'rb') as form:
+        with open(tax_path, 'rb') as form:
             tax_data = bytearray(form.read())
 
         # assume that taxa data is returned on screen after this
-        return path
+        return tax_path
